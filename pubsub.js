@@ -29,11 +29,11 @@
 		//
 		//	|		$.publish("/some/topic", ["a","b","c"]);
 		cache[topic] && d.each(cache[topic], function(){
-			this.apply(d, args || []);
+			this.callback.apply(this.context || d, args || []);
 		});
 	};
 
-	d.subscribe = function(/* String */topic, /* Function */callback){
+	d.subscribe = function(/* String */topic, /* Function */callback, /* Object? */context){
 		// summary:
 		//		Register a callback on a named topic.
 		// topic: String
@@ -42,6 +42,8 @@
 		//		The handler event. Anytime something is $.publish'ed on a 
 		//		subscribed channel, the callback will be called with the
 		//		published array as ordered arguments.
+		// context: Object?
+		//		The scope in which the callback will be called.
 		//
 		// returns: Array
 		//		A handle which can be used to unsubscribe this particular subscription.
@@ -51,8 +53,11 @@
 		//
 		if(!cache[topic]){
 			cache[topic] = [];
-		}
-		cache[topic].push(callback);
+		}		
+		cache[topic].push({
+			callback: callback,
+			context: context
+		});
 		return [topic, callback]; // Array
 	};
 
